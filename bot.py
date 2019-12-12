@@ -25,7 +25,8 @@ channels = {
             -1001244221197,  # ЧИП ДИШ
             -1001163906641,  # Вкусный Питер
             -1001379894986,  # Непатрики
-            -1001282209377   # foodieguide
+            -1001282209377,   # foodieguide
+            -1001104433974   # Restinmsk
             }
 
 
@@ -40,8 +41,7 @@ async def main():
 
         async for message in resto.iter_messages(channel):
 
-            data = ''
-            b64 = base64.b64encode(data.encode())
+            b64 = None
 
             if message.photo:
 
@@ -58,8 +58,8 @@ async def main():
                     e += 1
                     pass
 
-            lat = 0
-            lng = 0
+            lat = None
+            lng = None
 
             if message.geo:
                 lat = message.geo.lat
@@ -83,21 +83,21 @@ async def main():
                     s = ent.url
                     links.append(s)
 
-            empty = ''
             post = {
                     "text": str(message.message),
-                    "from": str(message.chat.id),
+                    "from": message.chat.id,
+                    "message_id": message.id,
                     "title": str(message.chat.title),
                     "date": message.date,
                     "images": b64,
                     "tags": tags,
                     "links": links,
-                    "category": empty,
+                    "category": None,
                     "address": {
-                        "formatted_address": empty,
+                        "formatted_address": None,
                         "lat": lat,
                         "lng": lng,
-                        "city": empty
+                        "city": None
                         }
 
                     }
