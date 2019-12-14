@@ -35,7 +35,6 @@ async def main():
 
     await Resto.send_message('me', "start")
     total = 0
-    e = 0
 
     for channel in Channels:
         await Resto(JoinChannelRequest(channel))
@@ -52,11 +51,7 @@ async def main():
                     os.remove(path)
 
                 except:  # sometimes there is trouble with profile pics
-                    print()
-                    print('=====OOPS!=====')
-                    print(message.chat.title, ": ", message.date)
-                    print('===============')
-                    e += 1
+                    pass
 
             lat = None
             lng = None
@@ -107,10 +102,6 @@ async def main():
         total += all_messages.total
 
     print("TOTAL: ", total)
-    print("errors: ", e)
-    await Resto.send_message('me', "finished")
-    await Resto.send_message('me', total)
-    await Resto.send_message('me', e)
 
 with Resto:
     Resto.loop.run_until_complete(main())
