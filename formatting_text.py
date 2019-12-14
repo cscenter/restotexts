@@ -1,74 +1,58 @@
-import re
-import pymorphy2
 from pymongo import MongoClient
+import pymorphy2
+import re
 
-morph = pymorphy2.MorphAnalyzer()
+Morph = pymorphy2.MorphAnalyzer()
 
-mclient = MongoClient('localhost', 27017)
-db = mclient.restotexts
-mposts = db.posts
+Mclient = MongoClient('localhost', 27017)
+Db = Mclient.restotexts
+Mposts = Db.posts
 
 
 def norm_word(word):
-    return morph.parse(word)[0].normal_form
+    return Morph.parse(word)[0].normal_form
 
 
 def trashpos(word):
-    tag = morph.parse(word)[0].tag
-    if 'NPRO' in tag\
-            or 'PRED' in tag\
-            or 'PREP' in tag\
-            or 'CONJ' in tag\
-            or 'PRCL' in tag\
-            or 'INTJ' in tag\
-            or 'Apro' in tag\
-            or 'Ques' in tag\
-            or 'Prdx' in tag\
-            or 'NUMR' in tag\
-            or 'Dmns' in tag:
-        return True
-    else:
-        return False
+    pos_tags = ['NPRO', 'PRED', 'PREP', 'CONJ', 'PRCL', 'INTJ', 'Apro', 'Ques', 'Prdx', 'NUMR', 'Dmns']
+    tag = Morph.parse(word)[0].tag
+    return any(pos_tag in tag for pos_tag in pos_tags)
 
 
-def format(text):
+def formatting(text):
     text = re.sub(r"[^А-Яа-яЁё ]+", ' ', text)
     return text.lower()
 
 
 def del_spaces(text):
-    while "  " in text:
-        text = text.replace("  ", " ")
+    text = re.sub(" +", " ", text)
     return text
 
 
 def text2list(text):
-    text = format(text)
-    list = text.split(' ')
-    return list
+    return text.split(' ')
 
 
 def list2text(list):
-    text = ' '.join([word for word in list])
-    return text
+    return ' '.join([word for word in list])
 
 
-file_trash = open('trash.txt', 'r')
-trash = text2list(file_trash.read())
+File_trash = open('trash.txt', 'r')
+Trash = text2list(File_trash.read())
 
-for post in mposts.find():
+for post in Mposts.find():
     id = post.get("_id")
     text = post.get('text')
     if text == "" or text is None:
         continue
 
-    text = format(text)
+    text = formatting(text)
     l = text2list(text)
     l = [norm_word(word) for word in l]
 
     to_delete = []
     for index, word in enumerate(l):
-        if trashpos(word) or norm_word(word) in trash:
+        if trashpos(word) or norm_word(word) in Trash:
             to_delete.append(index)
             print(word.upper(), l)
 
@@ -76,6 +60,6 @@ for post in mposts.find():
         del l[index]
 
     text = del_spaces(list2text(l))
-    db.posts.update_one({"_id": id}, {"$set": {"formatted_text": text}})
+    Db.posts.update_one({"_id": id}, {"$set": {"formatted_text": text}})
 
-file_trash.close()
+File_trash.close()
