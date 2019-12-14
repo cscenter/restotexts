@@ -33,8 +33,8 @@ def text2list(text):
     return text.split(' ')
 
 
-def list2text(list):
-    return ' '.join([word for word in list])
+def list2text(l):
+    return ' '.join((word for word in l))
 
 
 File_trash = open('trash.txt', 'r')
