@@ -1,22 +1,23 @@
+import base64
+from pymongo import MongoClient
+import os
+import telethon
 from telethon import TelegramClient, events, sync
 from telethon.tl.functions.channels import JoinChannelRequest
-import telethon
-from pymongo import MongoClient
-import base64
-import os
+
 
 print("Input your Telegram API id:")  # Authorisation
-api_id = int(input())
+Api_id = int(input())
 print("Input your API hash:")
-api_hash = str(input())
+Api_hash = str(input())
 
-resto = TelegramClient('session_name', api_id, api_hash)
-mclient = MongoClient('localhost', 27017)  # MongoDB should be already started
+Resto = TelegramClient('session_name', Api_id, Api_hash)
+Mclient = MongoClient('localhost', 27017)  # MongoDB should be already started
 
-db = mclient.restotexts
-posts = db.posts
+Db = Mclient.restotexts
+Posts = Db.posts
 
-channels = {
+Channels = {
             -1001141587803,  # Где вкусно поесть
             -1001100608817,  # Restoraids
             -1001164680315,  # FooDiscovery
@@ -32,14 +33,14 @@ channels = {
 
 async def main():
 
-    await resto.send_message('me', "start")
+    await Resto.send_message('me', "start")
     total = 0
     e = 0
 
-    for channel in channels:
-        await resto(JoinChannelRequest(channel))
+    for channel in Channels:
+        await Resto(JoinChannelRequest(channel))
 
-        async for message in resto.iter_messages(channel):
+        async for message in Resto.iter_messages(channel):
 
             b64 = None
 
@@ -56,7 +57,6 @@ async def main():
                     print(message.chat.title, ": ", message.date)
                     print('===============')
                     e += 1
-                    pass
 
             lat = None
             lng = None
@@ -101,17 +101,17 @@ async def main():
                         }
 
                     }
-            posts.insert_one(post)
+            Posts.insert_one(post)
 
-        all_messages = await resto.get_messages(channel)
+        all_messages = await Resto.get_messages(channel)
         total += all_messages.total
 
     print("TOTAL: ", total)
     print("errors: ", e)
-    await resto.send_message('me', "finished")
-    await resto.send_message('me', total)
-    await resto.send_message('me', e)
+    await Resto.send_message('me', "finished")
+    await Resto.send_message('me', total)
+    await Resto.send_message('me', e)
 
-with resto:
-    resto.loop.run_until_complete(main())
+with Resto:
+    Resto.loop.run_until_complete(main())
 
