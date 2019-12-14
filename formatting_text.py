@@ -43,7 +43,7 @@ Trash = text2list(File_trash.read())
 for post in Mposts.find():
     id = post.get("_id")
     text = post.get('text')
-    if text == "" or text is None:
+    if not text:
         continue
 
     text = formatting(text)
