@@ -38,8 +38,8 @@ def list2text(l):
 
 
 File_trash = open('trash.txt', 'r')
-Trash = text2list(File_trash.read())
-
+a = File_trash.read()
+Trash = a.split('\n')
 for post in Mposts.find():
     id = post.get("_id")
     text = post.get('text')
